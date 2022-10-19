@@ -1,19 +1,18 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
-import { CreatePokemonDto } from "./dto/create-pokemon.dto";
-import { PokemonInterface } from "./interface/pokemon.interface";
+import { Body, Controller, Get, Param } from "@nestjs/common";
+import { PokemonDto } from "./dto/pokemon.dto";
 import { PokemonService } from "../service/pokemon.service";
 
-@Controller('pokemon')
-export class PokemonController {
-    constructor(private readonly pokemonService: PokemonService) {}
-
+  @Controller('pokemon')
+  export class PokemonController {
+    constructor(private pokemonService: PokemonService) {}
+  
     @Get()
-    async getPokemon(): Promise<PokemonInterface[]> {
-        return this.pokemonService.getPokemon();
+    async findAll() {
+      return await this.pokemonService.getAllPokemon();
     }
-
-    @Post()
-    async createPokemon(@Body() createPokemonDto: CreatePokemonDto) {
-        this.pokemonService.createPokemon(createPokemonDto);
+  
+    @Get(':name')
+    async getPokemon(@Param('name') name: string): Promise<PokemonDto> {
+      return await this.pokemonService.getPokemon(name);
     }
 }
