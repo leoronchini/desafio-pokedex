@@ -16,6 +16,7 @@ export class PokemonService {
   ) { }
 
   async getAllPokemon(): Promise<PokemonEntity[]> {
+    console.log(`Returned all pokemons from database.`);
     return await this.pokesEntity.find();
   }
 
@@ -23,7 +24,7 @@ export class PokemonService {
     let pokemonDto: PokemonDto;
 
     pokemonDto = await this.getPokemonFromDatabase(name);
-    if (pokemonDto == null) {
+    if (!pokemonDto) {
       pokemonDto = await this.getPokemonFromApi(name);
     }
 
@@ -41,7 +42,8 @@ export class PokemonService {
 
         pokemonResult = new PokemonDto(result.name, result.link);
       });
-
+      console.log("aaaaaaa")
+      console.log(`Pokemon has found on database: ${pokemonResult}`);
       return pokemonResult;
 
     } catch (err) {
@@ -56,14 +58,18 @@ export class PokemonService {
       const response = await firstValueFrom(this.httpService.get(url));
       const pokemonName = response.data.name;
       const pokemonLink = response.data.sprites.other['official-artwork'].front_default;
-      
+
       const pokemonResult: PokemonDto = new PokemonDto(pokemonName, pokemonLink);
 
       await this.savePokemonOnDatabase(pokemonResult);
-
+      
+      console.log(`Pokemon has found on api: ${pokemonResult}`);
       return pokemonResult;
 
     } catch (err) {
+      if (err.code === 404) {
+        throw (`The pokemon ${name} does not exist on api. Error: ${err.message}`);
+      }
       throw (`An error occurred while getting pokemon from api: ${err.message}`);
     }
   }
@@ -71,8 +77,10 @@ export class PokemonService {
   async savePokemonOnDatabase(pokemonResult: PokemonDto) {
     try {
       await this.pokemonRepository.save(pokemonResult);
+      console.log("Pokemon has inserted on database");
     } catch (err) {
-      throw (`An error occurred while saving pokemon on database: ${err.message}`);
+      throw (`An error occurred while inserting pokemon on database: ${err.message}`);
     }
   }
 }
+ 
