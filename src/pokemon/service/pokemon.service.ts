@@ -6,6 +6,7 @@ import { PokemonEntity } from '../controller/entity/pokemon.entity';
 import { PokemonDto } from '../controller/dto/pokemon.dto';
 import { PokemonRepository } from '../controller/repository/pokemon.repository';
 import { firstValueFrom } from 'rxjs';
+import { stringify } from 'querystring';
 
 @Injectable()
 export class PokemonService {
@@ -21,14 +22,18 @@ export class PokemonService {
   }
 
   async getPokemon(name: string): Promise<PokemonDto> {
-    let pokemonDto: PokemonDto;
-
-    pokemonDto = await this.getPokemonFromDatabase(name);
-    if (!pokemonDto) {
-      pokemonDto = await this.getPokemonFromApi(name);
+    const pokemonDto = await this.getPokemonFromDatabase(name);
+    if (pokemonDto) {
+      console.log(`Pokemon has found on database: ${JSON.stringify(pokemonDto) }`);
+      return pokemonDto;
     }
+    
+    const pokemonResult = await this.getPokemonFromApi(name);
+    await this.pokemonRepository.save(pokemonResult);
+    console.log(`Pokemon has found on api: ${JSON.stringify(pokemonResult)}`);
+    console.log(`Pokemon inserted on database.`);
 
-    return pokemonDto;
+    return pokemonResult;
   }
 
   async getPokemonFromDatabase(name: string): Promise<PokemonDto> {
@@ -42,8 +47,7 @@ export class PokemonService {
 
         pokemonResult = new PokemonDto(result.name, result.link);
       });
-      console.log("aaaaaaa")
-      console.log(`Pokemon has found on database: ${pokemonResult}`);
+
       return pokemonResult;
 
     } catch (err) {
@@ -61,26 +65,13 @@ export class PokemonService {
 
       const pokemonResult: PokemonDto = new PokemonDto(pokemonName, pokemonLink);
 
-      await this.savePokemonOnDatabase(pokemonResult);
-      
-      console.log(`Pokemon has found on api: ${pokemonResult}`);
       return pokemonResult;
 
     } catch (err) {
-      if (err.code === 404) {
-        throw (`The pokemon ${name} does not exist on api. Error: ${err.message}`);
+      if (err.response.status === 404) {
+        throw (`The pokemon "${name}" does not exist on api. Error: ${err.message}`);
       }
       throw (`An error occurred while getting pokemon from api: ${err.message}`);
     }
   }
-
-  async savePokemonOnDatabase(pokemonResult: PokemonDto) {
-    try {
-      await this.pokemonRepository.save(pokemonResult);
-      console.log("Pokemon has inserted on database");
-    } catch (err) {
-      throw (`An error occurred while inserting pokemon on database: ${err.message}`);
-    }
-  }
 }
- 

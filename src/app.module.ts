@@ -11,7 +11,7 @@ import { PokemonModule } from './pokemon/pokemon.module';
       "username": "root",
       "password": "12345678",
       "database": "pokemon",
-      "entities": ["dist/**/*.entity{.ts,.js}"],
+      "entities": ["src/**/*.entity{.ts,.js}"],
       "synchronize": true
     }
   ), PokemonModule],
