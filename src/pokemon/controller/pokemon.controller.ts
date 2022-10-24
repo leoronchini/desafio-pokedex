@@ -6,11 +6,6 @@ import { PokemonService } from "../service/pokemon.service";
   export class PokemonController {
     constructor(private pokemonService: PokemonService) {}
   
-    @Get()
-    async findAll() {
-      return await this.pokemonService.getAllPokemon();
-    }
-  
     @Get(':name')
     async getPokemon(@Param('name') name: string): Promise<PokemonDto> {
       return await this.pokemonService.getPokemon(name);

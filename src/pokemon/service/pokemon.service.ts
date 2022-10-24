@@ -1,25 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { PokemonEntity } from '../controller/entity/pokemon.entity';
 import { PokemonDto } from '../controller/dto/pokemon.dto';
 import { PokemonRepository } from '../controller/repository/pokemon.repository';
 import { firstValueFrom } from 'rxjs';
-import { stringify } from 'querystring';
 
 @Injectable()
 export class PokemonService {
   constructor(
-    @InjectRepository(PokemonEntity) private pokesEntity: Repository<PokemonEntity>,
     private readonly httpService: HttpService,
     private readonly pokemonRepository: PokemonRepository
   ) { }
 
-  async getAllPokemon(): Promise<PokemonEntity[]> {
-    console.log(`Returned all pokemons from database.`);
-    return await this.pokesEntity.find();
-  }
 
   async getPokemon(name: string): Promise<PokemonDto> {
     const pokemonDto = await this.getPokemonFromDatabase(name);

@@ -1,8 +1,8 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { IsString, MaxLength, MinLength } from 'class-validator';
 
 @Entity()
-export class PokemonEntity extends BaseEntity {
+export class PokemonEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -17,4 +17,8 @@ export class PokemonEntity extends BaseEntity {
   @IsString()
   link: string;
 
+  constructor(name: string, link: string) {
+    this.name = name;
+    this.link = link;
+  }
 }

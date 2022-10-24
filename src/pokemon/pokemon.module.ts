@@ -7,7 +7,7 @@ import { PokemonRepository } from './controller/repository/pokemon.repository';
 import { PokemonService } from './service/pokemon.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([PokemonEntity]), HttpModule],
+  imports: [HttpModule, TypeOrmModule.forFeature([PokemonEntity])],
   controllers: [PokemonController],
   providers: [PokemonService, PokemonRepository],
 })
